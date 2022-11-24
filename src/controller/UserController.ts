@@ -4,6 +4,7 @@ import { UserBusiness } from "../business/UserBusiness";
 import { BaseDatabase } from "../data/BaseDatabase";
 
 export class UserController {
+    constructor (private userBusiness: UserBusiness) {}
     async signup(req: Request, res: Response) {
         try {
 
@@ -14,13 +15,16 @@ export class UserController {
                 role: req.body.role
             }
 
-            const userBusiness = new UserBusiness();
-            const token = await userBusiness.createUser(input);
+           
+            const token = await this.userBusiness.createUser(input);
 
-            res.status(200).send({ token });
+            res.status(200).send({ 
+                message: "Conta criada.",
+                token
+             });
 
         } catch (error:any) {
-            res.status(400).send({ error: error.message });
+            res.status(error.statusCode).send( error.message );
         }
 
         await BaseDatabase.destroyConnection();
@@ -35,8 +39,8 @@ export class UserController {
                 password: req.body.password
             };
 
-            const userBusiness = new UserBusiness();
-            const token = await userBusiness.getUserByEmail(loginData);
+            
+            const token = await this.userBusiness.loginBusiness(loginData);
 
             res.status(200).send({ token });
 
