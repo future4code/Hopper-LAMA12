@@ -1,0 +1,9 @@
+POST http://localhost:3003/user/signup
+Content-Type: application/json
+
+{
+    "name": "Gabriel Oliveira",
+    "email":"gabriel@gmail.com",
+    "password": "gab123",
+    "role": "ADMIN"
+}
