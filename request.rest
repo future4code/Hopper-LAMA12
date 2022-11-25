@@ -1,9 +1,34 @@
+//CREATE USER
 POST http://localhost:3003/user/signup
 Content-Type: application/json
 
 {
-    "name": "Gabriel Oliveira",
-    "email":"gabriel@gmail.com",
-    "password": "gab123",
+    "name": "Peu Saldanha",
+    "email":"peu@gmail.com",
+    "password": "peu123",
     "role": "ADMIN"
+}
+
+###
+//LOGIN
+POST http://localhost:3003/user/login
+Content-Type: application/json
+
+
+{
+    "email": "peu@gmail.com",
+    "password": "peu123"
+}
+
+
+###
+// REGISTER BAND
+POST http://localhost:3003/band/register
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIxMzBmYTAzLWIzNzktNDM2YS04NzdmLWY5MzE3ZDRmMzdjOSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTY2OTM0Mjc0OCwiZXhwIjoxNjY5MzQzMzQ4fQ.mz8zEg7jcKxEIOWgxtYnJuUYKU3Zg4urDTWCqlOekoE
+
+{
+    "name": "Alok",
+    "music_genre": "Eletrônica",
+    "responsible": "Alok Achkar Peres Petrillo"
 }

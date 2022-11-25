@@ -1,11 +1,13 @@
 import { UserDataBase } from "../data/UserDataBase";
 import { CustomError } from "../error/CustomError";
+import { UserNotFound } from "../error/EmailNotFound";
 import { InvalidEmail } from "../error/InvalidEmail";
+import { InvalidPassword } from "../error/InvalidPassword";
 import { InvalidRequest } from "../error/InvalidReq";
 import { InvalidRole } from "../error/InvalidRole";
 import { RegisteredEmail } from "../error/RegisteredEmail";
 import { ShortPassword } from "../error/ShortPassword";
-import { User, UserInputDTO, USER_ROLE } from "../model/User";
+import { InputLoginDTO, User, UserInputDTO, USER_ROLE } from "../model/User";
 import { Authenticator } from "../services/Authenticator";
 import { HashManager } from "../services/HashManager";
 import { generateId } from "../services/IdGenerator";
@@ -22,7 +24,6 @@ export class UserBusiness {
 
       if (!name || !email || !password || !role) {
         throw new InvalidRequest();
-        
       }
       if (password.length < 6) {
         throw new ShortPassword();
@@ -39,18 +40,54 @@ export class UserBusiness {
       }
 
       const id: string = generateId();
-      const hashPassword: string = await hashManager.hash(password)
+      const hashPassword: string = await hashManager.hash(password);
 
-      const user: User ={
+      const user: User = {
         id,
         name,
         email,
         password: hashPassword,
-        role
+        role,
       };
 
-      await userDataBase.signUp(user)
-      const token = await authenticator.generateToken({id, role})
+      await userDataBase.signUp(user);
+      const token = await authenticator.generateToken({ id, role });
+      return token;
+    } catch (error: any) {
+      throw new CustomError(400, error.message);
+    }
+  };
+
+  public login = async (input: InputLoginDTO) => {
+    try {
+      const { email, password } = input;
+
+      if (!email || !password) {
+        throw new InvalidRequest();
+      }
+      if (!ValidateEmail.test(email)) {
+        throw new InvalidEmail();
+      }
+      const user = await userDataBase.login(email);
+
+      if (!user) {
+        throw new UserNotFound();
+      }
+
+      const isValidPassword: boolean = await hashManager.compare(
+        password,
+        user.password
+      );
+
+      if (!isValidPassword) {
+        throw new InvalidPassword();
+      }
+
+      const token = authenticator.generateToken({
+        id: user.id,
+        role: user.role,
+      });
+      return token;
     } catch (error: any) {
       throw new CustomError(400, error.message);
     }
